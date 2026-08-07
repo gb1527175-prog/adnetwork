@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Support — AdNetX</title>
+<meta name="robots" content="noindex" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="dash-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">Ax</span> AdNetX</div>
+    <a class="side-link" href="index.html">▦ Overview</a>
+    <a class="side-link" href="ad-units.html">◇ Ad Units</a>
+    <a class="side-link" href="earnings.html">₹ Earnings</a>
+    <a class="side-link" href="analytics.html">◔ Analytics</a>
+    <a class="side-link" href="payments.html">⇅ Payments</a>
+    <a class="side-link" href="referrals.html">◈ Referrals</a>
+    <a class="side-link active" href="support.html">✉ Support</a>
+    <a class="side-link" href="settings.html">⚙ Settings</a>
+    <div style="height:1px; background:rgba(255,255,255,0.08); margin:14px 0;"></div>
+    <a class="side-link" href="#" id="logoutLink">↪ Log out</a>
+  </aside>
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <h3 style="margin:0; font-size:1.1rem;">Support</h3>
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+    </div>
+    <div class="dash-content">
+      <div class="grid-2" style="align-items:start;">
+        <div class="card">
+          <h4 style="margin-top:0;">Raise a ticket</h4>
+          <form id="ticketForm">
+            <div class="form-field"><label>Subject</label><input id="ticketSubject" required maxlength="120" /></div>
+            <div class="form-field"><label>Message</label>
+              <textarea id="ticketMessage" required maxlength="1000" rows="5" style="width:100%; padding:12px 14px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg); color:var(--text); font-family:inherit;"></textarea>
+            </div>
+            <button class="btn btn-primary btn-block">Submit Ticket</button>
+            <p id="ticketStatus" class="form-note" style="margin-top:10px;"></p>
+          </form>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0;">Your tickets</h4>
+          <table class="table-clean">
+            <thead><tr><th>Subject</th><th>Status</th></tr></thead>
+            <tbody id="ticketRows"><tr><td colspan="2" class="text-muted">No tickets yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  let uid;
+  requireAuth((user) => {
+    uid = user.uid;
+    initDashboardChrome(user);
+    loadTickets();
+  });
+  document.getElementById("logoutLink").addEventListener("click", (e) => { e.preventDefault(); logout(); });
+
+  document.getElementById("ticketForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const status = document.getElementById("ticketStatus");
+    try {
+      await db.collection("users").doc(uid).collection("tickets").add({
+        subject: document.getElementById("ticketSubject").value.trim(),
+        message: document.getElementById("ticketMessage").value.trim(),
+        status: "open",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      status.textContent = "Ticket submitted — we'll respond within 24 hours.";
+      status.style.color = "var(--mint)";
+      e.target.reset();
+      loadTickets();
+    } catch {
+      status.textContent = "Couldn't submit — check your Firebase setup.";
+      status.style.color = "var(--danger)";
+    }
+  });
+
+  async function loadTickets() {
+    const tbody = document.getElementById("ticketRows");
+    try {
+      const snap = await db.collection("users").doc(uid).collection("tickets").orderBy("createdAt", "desc").get();
+      if (snap.empty) return;
+      tbody.innerHTML = snap.docs.map((d) => {
+        const t = d.data();
+        return `<tr><td>${t.subject}</td><td><span class="badge badge-pending">${t.status}</span></td></tr>`;
+      }).join("");
+    } catch {}
+  }
+</script>
+</body>
+</html>

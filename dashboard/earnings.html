@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Earnings — AdNetX</title>
+<meta name="robots" content="noindex" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="dash-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">Ax</span> AdNetX</div>
+    <a class="side-link" href="index.html">▦ Overview</a>
+    <a class="side-link" href="ad-units.html">◇ Ad Units</a>
+    <a class="side-link active" href="earnings.html">₹ Earnings</a>
+    <a class="side-link" href="analytics.html">◔ Analytics</a>
+    <a class="side-link" href="payments.html">⇅ Payments</a>
+    <a class="side-link" href="referrals.html">◈ Referrals</a>
+    <a class="side-link" href="support.html">✉ Support</a>
+    <a class="side-link" href="settings.html">⚙ Settings</a>
+    <div style="height:1px; background:rgba(255,255,255,0.08); margin:14px 0;"></div>
+    <a class="side-link" href="#" id="logoutLink">↪ Log out</a>
+  </aside>
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <h3 style="margin:0; font-size:1.1rem;">Earnings</h3>
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+    </div>
+    <div class="dash-content">
+      <div class="card" style="margin-bottom:24px;">
+        <h4 style="margin-top:0;">Daily earnings — last 14 days</h4>
+        <canvas id="earningsChart" height="160"></canvas>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0;">Monthly summary</h4>
+        <div style="overflow-x:auto;">
+          <table class="table-clean">
+            <thead><tr><th>Month</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Earnings</th></tr></thead>
+            <tbody id="monthlyRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  requireAuth((user) => {
+    initDashboardChrome(user);
+    fetchLast14DaysStats(user.uid).then(renderEarningsChart);
+    renderMonthlySummary();
+  });
+  document.getElementById("logoutLink").addEventListener("click", (e) => { e.preventDefault(); logout(); });
+
+  function renderMonthlySummary() {
+    const months = ["May 2026", "Jun 2026", "Jul 2026"];
+    document.getElementById("monthlyRows").innerHTML = months.map((m) => {
+      const impressions = Math.floor(Math.random() * 80000) + 40000;
+      const clicks = Math.floor(impressions * 0.015);
+      const earnings = (clicks * 2.1).toFixed(2);
+      const ctr = ((clicks / impressions) * 100).toFixed(2);
+      return `<tr><td>${m}</td><td>${clicks.toLocaleString()}</td><td>${impressions.toLocaleString()}</td><td>${ctr}%</td><td>${formatINR(earnings)}</td></tr>`;
+    }).join("");
+  }
+</script>
+</body>
+</html>

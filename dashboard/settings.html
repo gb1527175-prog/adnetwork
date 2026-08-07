@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Settings — AdNetX</title>
+<meta name="robots" content="noindex" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="dash-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">Ax</span> AdNetX</div>
+    <a class="side-link" href="index.html">▦ Overview</a>
+    <a class="side-link" href="ad-units.html">◇ Ad Units</a>
+    <a class="side-link" href="earnings.html">₹ Earnings</a>
+    <a class="side-link" href="analytics.html">◔ Analytics</a>
+    <a class="side-link" href="payments.html">⇅ Payments</a>
+    <a class="side-link" href="referrals.html">◈ Referrals</a>
+    <a class="side-link" href="support.html">✉ Support</a>
+    <a class="side-link active" href="settings.html">⚙ Settings</a>
+    <div style="height:1px; background:rgba(255,255,255,0.08); margin:14px 0;"></div>
+    <a class="side-link" href="#" id="logoutLink">↪ Log out</a>
+  </aside>
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <h3 style="margin:0; font-size:1.1rem;">Settings</h3>
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+    </div>
+    <div class="dash-content">
+      <div class="card" style="max-width:520px;">
+        <h4 style="margin-top:0;">Profile</h4>
+        <div class="form-field"><label>Name</label><input id="setName" /></div>
+        <div class="form-field"><label>Email</label><input id="setEmail" disabled /></div>
+        <button class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+        <p id="profileSaved" class="form-note" style="display:none; color:var(--mint); margin-top:10px;">Saved.</p>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  let currentUser;
+  requireAuth((user) => {
+    currentUser = user;
+    initDashboardChrome(user);
+    document.getElementById("setName").value = user.displayName || "";
+    document.getElementById("setEmail").value = user.email;
+  });
+  document.getElementById("logoutLink").addEventListener("click", (e) => { e.preventDefault(); logout(); });
+
+  document.getElementById("saveProfileBtn").addEventListener("click", async () => {
+    const name = document.getElementById("setName").value.trim();
+    await currentUser.updateProfile({ displayName: name });
+    await db.collection("users").doc(currentUser.uid).update({ name }).catch(() => {});
+    const saved = document.getElementById("profileSaved");
+    saved.style.display = "block";
+    setTimeout(() => (saved.style.display = "none"), 2000);
+  });
+</script>
+</body>
+</html>

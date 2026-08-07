@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Payments — AdNetX</title>
+<meta name="robots" content="noindex" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="dash-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">Ax</span> AdNetX</div>
+    <a class="side-link" href="index.html">▦ Overview</a>
+    <a class="side-link" href="ad-units.html">◇ Ad Units</a>
+    <a class="side-link" href="earnings.html">₹ Earnings</a>
+    <a class="side-link" href="analytics.html">◔ Analytics</a>
+    <a class="side-link active" href="payments.html">⇅ Payments</a>
+    <a class="side-link" href="referrals.html">◈ Referrals</a>
+    <a class="side-link" href="support.html">✉ Support</a>
+    <a class="side-link" href="settings.html">⚙ Settings</a>
+    <div style="height:1px; background:rgba(255,255,255,0.08); margin:14px 0;"></div>
+    <a class="side-link" href="#" id="logoutLink">↪ Log out</a>
+  </aside>
+
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <h3 style="margin:0; font-size:1.1rem;">Payments</h3>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--signal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;" id="avatarInitial">·</div>
+          <span id="userName" class="text-muted" style="font-size:0.88rem;">Loading…</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-content">
+      <div class="grid-2" style="align-items:start;">
+
+        <div class="card">
+          <h4 style="margin-top:0;">Request a withdrawal</h4>
+          <p class="text-muted" style="font-size:0.85rem;">Available balance: <strong id="availableBalance" class="text-mint">₹0.00</strong> · Minimum withdrawal ₹500</p>
+          <form id="withdrawForm">
+            <div class="form-field">
+              <label for="method">Payment method</label>
+              <select id="method">
+                <option value="upi">UPI</option>
+                <option value="paypal">PayPal</option>
+                <option value="bank">Bank Transfer</option>
+              </select>
+            </div>
+            <div class="form-field" id="detailField">
+              <label for="detail">UPI ID</label>
+              <input id="detail" type="text" placeholder="yourname@upi" required />
+            </div>
+            <div class="form-field">
+              <label for="amount">Amount (₹)</label>
+              <input id="amount" type="number" min="500" step="1" required />
+            </div>
+            <p class="form-error" id="withdrawError"></p>
+            <button type="submit" class="btn btn-primary btn-block">Submit Withdrawal Request</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h4 style="margin-top:0;">Payment history</h4>
+          <div style="overflow-x:auto;">
+            <table class="table-clean">
+              <thead><tr><th>Date</th><th>Method</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody id="paymentRows"><tr><td colspan="4" class="text-muted">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  let currentUser;
+  requireAuth((user) => {
+    currentUser = user;
+    initDashboardChrome(user);
+    loadPaymentHistory(user.uid);
+    db.collection("users").doc(user.uid).get().then((snap) => {
+      const balance = snap.exists ? (snap.data().balance || 0) : 0;
+      document.getElementById("availableBalance").textContent = formatINR(balance);
+    });
+  });
+  document.getElementById("logoutLink").addEventListener("click", (e) => { e.preventDefault(); logout(); });
+
+  const methodSel = document.getElementById("method");
+  const detailField = document.getElementById("detailField");
+  methodSel.addEventListener("change", () => {
+    const map = {
+      upi: { label: "UPI ID", placeholder: "yourname@upi" },
+      paypal: { label: "PayPal Email", placeholder: "you@example.com" },
+      bank: { label: "Bank Account Number + IFSC", placeholder: "1234567890 / HDFC0001234" },
+    };
+    const cfg = map[methodSel.value];
+    detailField.querySelector("label").textContent = cfg.label;
+    detailField.querySelector("input").placeholder = cfg.placeholder;
+  });
+
+  document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById("withdrawError");
+    hideError(errEl);
+    const amount = parseFloat(document.getElementById("amount").value);
+    const detail = document.getElementById("detail").value.trim();
+    if (!detail) return showError(errEl, "Enter your payment details.");
+    if (amount < 500) return showError(errEl, "Minimum withdrawal amount is ₹500.");
+
+    try {
+      await db.collection("users").doc(currentUser.uid).collection("payments").add({
+        amount,
+        method: methodSel.value.toUpperCase(),
+        detail,
+        status: "pending",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      alert("Withdrawal request submitted — you'll see it reflected as 'pending' below.");
+      document.getElementById("withdrawForm").reset();
+      loadPaymentHistory(currentUser.uid);
+    } catch (err) {
+      showError(errEl, "Couldn't submit request. Please try again.");
+    }
+  });
+</script>
+</body>
+</html>

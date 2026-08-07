@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ad Units — AdNetX</title>
+<meta name="robots" content="noindex" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="dash-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">Ax</span> AdNetX</div>
+    <a class="side-link" href="index.html">▦ Overview</a>
+    <a class="side-link active" href="ad-units.html">◇ Ad Units</a>
+    <a class="side-link" href="earnings.html">₹ Earnings</a>
+    <a class="side-link" href="analytics.html">◔ Analytics</a>
+    <a class="side-link" href="payments.html">⇅ Payments</a>
+    <a class="side-link" href="referrals.html">◈ Referrals</a>
+    <a class="side-link" href="support.html">✉ Support</a>
+    <a class="side-link" href="settings.html">⚙ Settings</a>
+    <div style="height:1px; background:rgba(255,255,255,0.08); margin:14px 0;"></div>
+    <a class="side-link" href="#" id="logoutLink">↪ Log out</a>
+  </aside>
+
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <h3 style="margin:0; font-size:1.1rem;">Ad Units</h3>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--signal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;" id="avatarInitial">·</div>
+          <span id="userName" class="text-muted" style="font-size:0.88rem;">Loading…</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-content">
+      <p class="text-muted" style="max-width:600px; margin-top:0;">
+        Copy any code below and paste it into your site's HTML where you want the ad to appear.
+        Each unit is pre-tagged with your publisher ID so earnings are tracked automatically.
+      </p>
+      <div class="grid-3" id="adUnitGrid"></div>
+    </div>
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  requireAuth((user) => {
+    initDashboardChrome(user);
+    renderAdUnits(user.uid);
+  });
+  document.getElementById("logoutLink").addEventListener("click", (e) => { e.preventDefault(); logout(); });
+
+  function renderAdUnits(uid) {
+    const grid = document.getElementById("adUnitGrid");
+    grid.innerHTML = AD_SIZES.map((size) => {
+      const code = buildAdEmbedCode(uid, size.id);
+      const previewW = size.w === "100%" ? "100%" : Math.min(size.w, 260) + "px";
+      const previewH = Math.min(typeof size.h === "number" ? size.h : 120, 140) + "px";
+      return `
+        <div class="ad-unit-card card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h4 style="margin:0;">${size.label}</h4>
+            <span class="badge badge-success">${size.id}</span>
+          </div>
+          <div class="ad-preview" style="width:${previewW}; height:${previewH}; margin-left:auto; margin-right:auto;">
+            ${typeof size.w === "number" ? size.w + "×" + size.h : "Responsive"}
+          </div>
+          <div class="code-box" id="code-${size.id}">
+            <button class="btn btn-sm btn-primary copy-btn" onclick="copyToClipboard(document.getElementById('code-${size.id}').dataset.raw, this)">Copy Code</button>
+            <span data-raw-holder>${escapeHtml(code)}</span>
+          </div>
+        </div>`;
+    }).join("");
+
+    // stash raw (unescaped) code for clipboard copy
+    AD_SIZES.forEach((size) => {
+      const box = document.getElementById(`code-${size.id}`);
+      box.dataset.raw = buildAdEmbedCode(uid, size.id);
+    });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+</script>
+</body>
+</html>

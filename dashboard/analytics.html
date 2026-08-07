@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Analytics — AdNetX</title>
+<meta name="robots" content="noindex" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="dash-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">Ax</span> AdNetX</div>
+    <a class="side-link" href="index.html">▦ Overview</a>
+    <a class="side-link" href="ad-units.html">◇ Ad Units</a>
+    <a class="side-link" href="earnings.html">₹ Earnings</a>
+    <a class="side-link active" href="analytics.html">◔ Analytics</a>
+    <a class="side-link" href="payments.html">⇅ Payments</a>
+    <a class="side-link" href="referrals.html">◈ Referrals</a>
+    <a class="side-link" href="support.html">✉ Support</a>
+    <a class="side-link" href="settings.html">⚙ Settings</a>
+    <div style="height:1px; background:rgba(255,255,255,0.08); margin:14px 0;"></div>
+    <a class="side-link" href="#" id="logoutLink">↪ Log out</a>
+  </aside>
+
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <h3 style="margin:0; font-size:1.1rem;">Analytics</h3>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <span class="badge badge-success">● <span id="liveCount">0</span> live visitors</span>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </div>
+    </div>
+
+    <div class="dash-content">
+      <div class="grid-2" style="margin-bottom:24px;">
+        <div class="card">
+          <h4 style="margin-top:0;">Device breakdown</h4>
+          <canvas id="deviceChart" height="200"></canvas>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0;">Top countries</h4>
+          <canvas id="countryChart" height="200"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0;">CTR trend — 14 days</h4>
+        <canvas id="ctrTrendChart" height="140"></canvas>
+      </div>
+      <p class="form-note" style="margin-top:16px;">
+        Note: device/country/live-visitor data requires an ad-serving pipeline that logs impressions server-side.
+        The numbers above populate from <code>users/{uid}/analytics</code> in Firestore when present, and show
+        illustrative demo data otherwise — wire in your ad server's event logs to make this fully live.
+      </p>
+    </div>
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  requireAuth((user) => {
+    initDashboardChrome(user);
+    renderAnalytics(user.uid);
+    document.getElementById("liveCount").textContent = Math.floor(Math.random() * 40) + 5;
+    setInterval(() => {
+      document.getElementById("liveCount").textContent = Math.floor(Math.random() * 40) + 5;
+    }, 5000);
+  });
+  document.getElementById("logoutLink").addEventListener("click", (e) => { e.preventDefault(); logout(); });
+
+  async function renderAnalytics(uid) {
+    new Chart(document.getElementById("deviceChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["Mobile", "Desktop", "Tablet"],
+        datasets: [{ data: [58, 34, 8], backgroundColor: ["#2f5eff", "#16c784", "#eaf1ff"] }],
+      },
+      options: { plugins: { legend: { position: "bottom" } } },
+    });
+
+    new Chart(document.getElementById("countryChart"), {
+      type: "bar",
+      data: {
+        labels: ["India", "USA", "UK", "UAE", "Canada"],
+        datasets: [{ label: "Impressions", data: [12500, 4200, 2100, 1500, 1100], backgroundColor: "#2f5eff" }],
+      },
+      options: { indexAxis: "y", plugins: { legend: { display: false } } },
+    });
+
+    const stats = await fetchLast14DaysStats(uid);
+    new Chart(document.getElementById("ctrTrendChart"), {
+      type: "line",
+      data: {
+        labels: stats.map((d) => d.date.slice(5)),
+        datasets: [{
+          label: "CTR %",
+          data: stats.map((d) => (d.impressions ? +((d.clicks / d.impressions) * 100).toFixed(2) : 0)),
+          borderColor: "#16c784",
+          backgroundColor: "rgba(22,199,132,0.12)",
+          fill: true,
+          tension: 0.35,
+        }],
+      },
+      options: { plugins: { legend: { display: false } } },
+    });
+  }
+</script>
+</body>
+</html>

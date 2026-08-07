@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — AdNetX</title>
+<meta name="robots" content="noindex" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="dash-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">Ax</span> AdNetX</div>
+    <a class="side-link active" href="index.html">▦ Overview</a>
+    <a class="side-link" href="ad-units.html">◇ Ad Units</a>
+    <a class="side-link" href="earnings.html">₹ Earnings</a>
+    <a class="side-link" href="analytics.html">◔ Analytics</a>
+    <a class="side-link" href="payments.html">⇅ Payments</a>
+    <a class="side-link" href="referrals.html">◈ Referrals</a>
+    <a class="side-link" href="support.html">✉ Support</a>
+    <a class="side-link" href="settings.html">⚙ Settings</a>
+    <div style="height:1px; background:rgba(255,255,255,0.08); margin:14px 0;"></div>
+    <a class="side-link" href="#" id="logoutLink">↪ Log out</a>
+  </aside>
+
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button id="sidebarToggle" class="btn btn-ghost btn-sm" style="display:none;">☰</button>
+        <h3 style="margin:0; font-size:1.1rem;">Overview</h3>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <span class="badge badge-pending" id="verifyBadge" style="display:none;">Email not verified</span>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+        <div id="userChip" style="display:flex; align-items:center; gap:10px;">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--signal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;" id="avatarInitial">·</div>
+          <span id="userName" class="text-muted" style="font-size:0.88rem;">Loading…</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-content">
+
+      <!-- KPI cards -->
+      <div class="grid-4" style="margin-bottom:24px;">
+        <div class="kpi-card card">
+          <div class="kpi-label">Total Earnings</div>
+          <div class="kpi-value" id="kpiEarnings">₹0.00</div>
+          <div class="kpi-delta up">▲ 12.4% vs last month</div>
+        </div>
+        <div class="kpi-card card">
+          <div class="kpi-label">Clicks (30d)</div>
+          <div class="kpi-value" id="kpiClicks">0</div>
+          <div class="kpi-delta up">▲ 8.1%</div>
+        </div>
+        <div class="kpi-card card">
+          <div class="kpi-label">Impressions (30d)</div>
+          <div class="kpi-value" id="kpiImpressions">0</div>
+          <div class="kpi-delta up">▲ 5.6%</div>
+        </div>
+        <div class="kpi-card card">
+          <div class="kpi-label">Avg. CTR / CPM</div>
+          <div class="kpi-value" id="kpiCtr">0% · ₹0</div>
+          <div class="kpi-delta down">▼ 0.3%</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid-2" style="margin-bottom:24px;">
+        <div class="card">
+          <h4 style="margin-top:0;">Earnings — last 14 days</h4>
+          <canvas id="earningsChart" height="180"></canvas>
+        </div>
+        <div class="card">
+          <h4 style="margin-top:0;">Clicks vs Impressions</h4>
+          <canvas id="ctrChart" height="180"></canvas>
+        </div>
+      </div>
+
+      <!-- Payment history -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h4 style="margin:0;">Recent Payment History</h4>
+          <a href="payments.html" class="btn btn-sm btn-outline">View all</a>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="table-clean">
+            <thead>
+              <tr><th>Date</th><th>Method</th><th>Amount</th><th>Status</th></tr>
+            </thead>
+            <tbody id="paymentRows">
+              <tr><td colspan="4" class="text-muted">Loading payment history…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  requireAuth((user) => {
+    initDashboardChrome(user);
+    loadOverviewData(user);
+  });
+  document.getElementById("logoutLink").addEventListener("click", (e) => { e.preventDefault(); logout(); });
+  document.getElementById("sidebarToggle").addEventListener("click", () => {
+    document.getElementById("sidebar").classList.toggle("open");
+  });
+</script>
+</body>
+</html>
