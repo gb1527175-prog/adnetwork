@@ -1,0 +1,69 @@
+rules_version = '2';
+
+// Deploy with: firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    // Publisher profile: owner can read/update their own non-financial
+    // fields; only admins can change role/status/balance.
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isAdmin() ||
+        (isOwner(uid) &&
+         !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['role', 'status', 'balance']));
+      allow delete: if isAdmin();
+
+      // Daily stats — written by your ad-serving backend (Cloud Function
+      // with the Admin SDK, which bypasses these rules), read-only here.
+      match /stats/{date} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow write: if isAdmin();
+      }
+
+      // Withdrawal requests: publisher can create their own pending
+      // request; only admins can change status (approve/reject).
+      match /payments/{paymentId} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create: if isOwner(uid) && request.resource.data.status == "pending";
+        allow update, delete: if isAdmin();
+      }
+
+      match /adUnits/{adId} {
+        allow read, create: if isOwner(uid);
+        allow update, delete: if isOwner(uid) || isAdmin();
+      }
+    }
+
+    // Ad campaigns managed by admins only, publicly readable so ad
+    // tags can resolve creative.
+    match /adCampaigns/{campaignId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /siteConfig/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Public contact form — write-only, no one can read others' messages.
+    match /contactMessages/{msgId} {
+      allow create: if request.resource.data.keys().hasOnly(['name','email','message','createdAt'])
+        && request.resource.data.message.size() < 2000;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

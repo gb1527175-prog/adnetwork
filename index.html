@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AdNetX — Monetize Your Website with Premium Ads</title>
+<meta name="description" content="AdNetX is a publisher ad network — add one script, earn from clicks, impressions and native ads. Fast payouts via UPI, PayPal and bank transfer." />
+
+<!-- SEO / Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="AdNetX — Monetize Your Website with Premium Ads" />
+<meta property="og:description" content="Join thousands of publishers earning daily with AdNetX ad units, real-time analytics and fast payouts." />
+<meta property="og:image" content="/assets/og-cover.png" />
+<meta property="og:url" content="https://your-domain.example/" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="AdNetX — Monetize Your Website with Premium Ads" />
+<meta name="twitter:description" content="Publisher ad network with real-time stats and fast payouts." />
+<meta name="twitter:image" content="/assets/og-cover.png" />
+
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+<link rel="manifest" href="/manifest.json" />
+<link rel="canonical" href="https://your-domain.example/" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/style.css" />
+
+<!-- Schema.org -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "AdNetX",
+  "url": "https://your-domain.example/",
+  "description": "Publisher ad network offering display, native and responsive ad units with real-time analytics and fast payouts.",
+  "sameAs": []
+}
+</script>
+</head>
+<body>
+
+<div class="announce-bar">
+  🚀 New: Native Ad Units are live — average CTR up 34%.
+  <a href="/dashboard/ad-units.html">Try it now →</a>
+</div>
+
+<nav class="navbar">
+  <div class="container-app">
+    <a href="/" class="brand">
+      <span class="brand-mark">Ax</span> AdNetX
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+      <a href="/auth/login.html" class="btn btn-outline btn-sm">Log in</a>
+      <a href="/auth/register.html" class="btn btn-primary btn-sm">Start Earning</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container-app" style="display:flex; align-items:center; gap:50px; flex-wrap:wrap;">
+    <div style="flex:1; min-width:320px;" class="reveal">
+      <span class="hero-badge">💸 Payouts every Friday</span>
+      <h1>Turn your website's traffic into <span class="text-signal">real income</span>.</h1>
+      <p class="lead">AdNetX gives publishers premium display &amp; native ad units, live analytics, and reliable payouts via UPI, PayPal or bank transfer — set up in under five minutes.</p>
+      <div style="display:flex; gap:14px; margin-top:28px; flex-wrap:wrap;">
+        <a href="/auth/register.html" class="btn btn-primary">Create Free Account</a>
+        <a href="#features" class="btn btn-outline">See how it works</a>
+      </div>
+    </div>
+    <div style="flex:1; min-width:300px;" class="reveal">
+      <div class="glass" style="padding:22px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <strong class="font-mono" style="font-size:0.8rem; color:var(--text-muted);">TODAY'S EARNINGS</strong>
+          <span class="badge badge-success">● Live</span>
+        </div>
+        <div class="stat-num" style="font-size:2.6rem;">₹4,286.50</div>
+        <canvas id="heroSparkline" height="70"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signature element: live ticker board -->
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+</header>
+
+<!-- STATS -->
+<section class="section">
+  <div class="container-app grid-4" id="statsGrid">
+    <div class="stat-block reveal"><div class="stat-num" data-count="18400">0</div><div class="stat-label">Active Publishers</div></div>
+    <div class="stat-block reveal"><div class="stat-num" data-count="92" data-suffix="M">0</div><div class="stat-label">Monthly Impressions</div></div>
+    <div class="stat-block reveal"><div class="stat-num" data-count="4" data-prefix="₹" data-suffix=" Cr+">0</div><div class="stat-label">Paid to Publishers</div></div>
+    <div class="stat-block reveal"><div class="stat-num" data-count="99.9" data-suffix="%">0</div><div class="stat-label">Uptime</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features" style="background:var(--bg-alt);">
+  <div class="container-app">
+    <div style="text-align:center; max-width:600px; margin:0 auto 50px;">
+      <h2 style="font-size:2.2rem;">Everything a publisher needs</h2>
+      <p class="text-muted">One dashboard for ad codes, analytics, and payouts.</p>
+    </div>
+    <div class="grid-3">
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">▦</div>
+        <h4>Multiple Ad Formats</h4>
+        <p class="text-muted" style="font-size:0.92rem;">300×250, 728×90, 160×600, 320×50, native and fully responsive units — copy-paste ready.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">◔</div>
+        <h4>Real-Time Analytics</h4>
+        <p class="text-muted" style="font-size:0.92rem;">Track clicks, impressions, CTR and CPM by the minute, with device and country breakdowns.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">₹</div>
+        <h4>Fast, Flexible Payouts</h4>
+        <p class="text-muted" style="font-size:0.92rem;">Withdraw via UPI, PayPal or direct bank transfer once you cross the minimum threshold.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">◈</div>
+        <h4>Referral Program</h4>
+        <p class="text-muted" style="font-size:0.92rem;">Invite other publishers and earn a share of their earnings for life.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">✦</div>
+        <h4>Priority Support</h4>
+        <p class="text-muted" style="font-size:0.92rem;">Raise a support ticket right from your dashboard and get a response within 24 hours.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">⌁</div>
+        <h4>Built for Speed</h4>
+        <p class="text-muted" style="font-size:0.92rem;">Lightweight async ad tags that don't slow down your site or hurt your Core Web Vitals.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="container-app">
+    <div style="text-align:center; max-width:600px; margin:0 auto 50px;">
+      <h2 style="font-size:2.2rem;">Simple, transparent revenue share</h2>
+      <p class="text-muted">No setup fees. You only earn — we only earn when you do.</p>
+    </div>
+    <div class="grid-3">
+      <div class="price-card card reveal">
+        <h4>Starter</h4>
+        <div class="price-tag">70%<span style="font-size:0.9rem; color:var(--text-muted); font-weight:500;"> revenue share</span></div>
+        <p class="text-muted" style="font-size:0.88rem;">For new sites getting started</p>
+        <ul style="font-size:0.88rem; color:var(--text-muted); padding-left:18px; line-height:2;">
+          <li>Up to 3 ad units</li>
+          <li>Weekly payouts</li>
+          <li>Email support</li>
+        </ul>
+        <a href="/auth/register.html" class="btn btn-outline btn-block">Get Started</a>
+      </div>
+      <div class="price-card card featured reveal">
+        <span class="price-badge">Most Popular</span>
+        <h4>Growth</h4>
+        <div class="price-tag">80%<span style="font-size:0.9rem; color:var(--text-muted); font-weight:500;"> revenue share</span></div>
+        <p class="text-muted" style="font-size:0.88rem;">For growing publishers</p>
+        <ul style="font-size:0.88rem; color:var(--text-muted); padding-left:18px; line-height:2;">
+          <li>Unlimited ad units</li>
+          <li>Daily payouts</li>
+          <li>Native ads unlocked</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="/auth/register.html" class="btn btn-primary btn-block">Get Started</a>
+      </div>
+      <div class="price-card card reveal">
+        <h4>Enterprise</h4>
+        <div class="price-tag">Custom</div>
+        <p class="text-muted" style="font-size:0.88rem;">For large traffic networks</p>
+        <ul style="font-size:0.88rem; color:var(--text-muted); padding-left:18px; line-height:2;">
+          <li>Dedicated account manager</li>
+          <li>Custom API access</li>
+          <li>Highest fill rates</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline btn-block">Contact Sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq" style="background:var(--bg-alt);">
+  <div class="container-app" style="max-width:720px;">
+    <h2 style="text-align:center; font-size:2.2rem; margin-bottom:36px;">Frequently asked questions</h2>
+    <div id="faqList">
+      <div class="faq-item">
+        <button class="faq-q">How do I get paid? <span class="chevron">⌄</span></button>
+        <div class="faq-a">Via UPI, PayPal or direct bank transfer once your balance crosses the minimum withdrawal threshold, which you can check any time on your Earnings page.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Is there a minimum traffic requirement? <span class="chevron">⌄</span></button>
+        <div class="faq-a">No. You can start placing ad units the moment your account and site are verified, regardless of current traffic.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Will ads slow down my site? <span class="chevron">⌄</span></button>
+        <div class="faq-a">Our ad tags load asynchronously so they don't block your page's rendering or hurt your Core Web Vitals.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Can I use AdNetX alongside other ad networks? <span class="chevron">⌄</span></button>
+        <div class="faq-a">Yes, most publishers run AdNetX alongside their existing setup — just keep ad density reasonable for a good user experience.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="container-app" style="max-width:560px;">
+    <h2 style="text-align:center; font-size:2rem; margin-bottom:8px;">Get in touch</h2>
+    <p class="text-muted" style="text-align:center; margin-bottom:30px;">Questions about pricing, integration, or partnerships — we reply within a day.</p>
+    <form id="contactForm" class="card glass" style="padding:30px;">
+      <div class="form-field">
+        <label for="cName">Name</label>
+        <input id="cName" name="name" type="text" required maxlength="80" />
+      </div>
+      <div class="form-field">
+        <label for="cEmail">Email</label>
+        <input id="cEmail" name="email" type="email" required maxlength="120" />
+      </div>
+      <div class="form-field">
+        <label for="cMsg">Message</label>
+        <textarea id="cMsg" name="message" required maxlength="1000" rows="4" style="width:100%; padding:12px 14px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg); color:var(--text); font-family:inherit;"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+      <p id="contactStatus" class="form-note" style="margin-top:12px; text-align:center;"></p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="container-app">
+    <div class="grid-4">
+      <div>
+        <div class="brand" style="color:#fff; margin-bottom:14px;"><span class="brand-mark">Ax</span> AdNetX</div>
+        <p style="font-size:0.85rem; color:#9db1d1;">A modern ad network for independent publishers.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="/dashboard/ad-units.html">Ad Units</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="#faq">FAQ</a>
+        <a href="#contact">Contact</a>
+        <a href="/blog/index.html">Blog</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 AdNetX. All rights reserved.</span>
+      <span>Made for independent publishers.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/main.js"></script>
+</body>
+</html>
