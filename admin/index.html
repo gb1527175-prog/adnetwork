@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Panel — AdNetX</title>
+<meta name="robots" content="noindex" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div class="dash-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">Ax</span> Admin</div>
+    <a class="side-link active" data-tab="users" href="#users">◈ Users</a>
+    <a class="side-link" data-tab="ads" href="#ads">◇ Ad Inventory</a>
+    <a class="side-link" data-tab="revenue" href="#revenue">₹ Revenue</a>
+    <a class="side-link" data-tab="payments" href="#payments">⇅ Payment Requests</a>
+    <a class="side-link" data-tab="settings" href="#settings">⚙ Site Settings</a>
+    <div style="height:1px; background:rgba(255,255,255,0.08); margin:14px 0;"></div>
+    <a class="side-link" href="#" id="logoutLink">↪ Log out</a>
+  </aside>
+
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <h3 style="margin:0; font-size:1.1rem;" id="panelTitle">User Management</h3>
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+    </div>
+
+    <div class="dash-content">
+      <div id="accessNotice" class="card" style="display:none; border-color:var(--danger);">
+        <strong class="text-mint" style="color:var(--danger);">Admins only.</strong>
+        <p class="text-muted" style="margin-bottom:0;">
+          This account's <code>role</code> field in Firestore is not <code>admin</code>. Set
+          <code>users/&#123;uid&#125;.role = "admin"</code> manually in the Firebase console for your admin account,
+          then reload — see <code>firestore.rules</code> for how this is enforced server-side.
+        </p>
+      </div>
+
+      <div id="panels" style="display:none;">
+
+        <!-- USERS -->
+        <section class="tab-panel" id="tab-users">
+          <div class="grid-4" style="margin-bottom:20px;">
+            <div class="kpi-card card"><div class="kpi-label">Total Publishers</div><div class="kpi-value" id="statTotalUsers">—</div></div>
+            <div class="kpi-card card"><div class="kpi-label">Active</div><div class="kpi-value" id="statActiveUsers">—</div></div>
+            <div class="kpi-card card"><div class="kpi-label">Blocked</div><div class="kpi-value" id="statBlockedUsers">—</div></div>
+            <div class="kpi-card card"><div class="kpi-label">New (7d)</div><div class="kpi-value" id="statNewUsers">—</div></div>
+          </div>
+          <div class="card">
+            <h4 style="margin-top:0;">All publishers</h4>
+            <div style="overflow-x:auto;">
+              <table class="table-clean">
+                <thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="userRows"><tr><td colspan="5" class="text-muted">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ADS -->
+        <section class="tab-panel" id="tab-ads" style="display:none;">
+          <div class="grid-2" style="align-items:start;">
+            <div class="card">
+              <h4 style="margin-top:0;">Add ad campaign</h4>
+              <form id="addAdForm">
+                <div class="form-field"><label>Campaign name</label><input id="adName" required maxlength="80" /></div>
+                <div class="form-field"><label>Size</label>
+                  <select id="adSize">
+                    <option>300x250</option><option>728x90</option><option>160x600</option><option>320x50</option><option>Native</option><option>Responsive</option>
+                  </select>
+                </div>
+                <div class="form-field"><label>Target URL</label><input id="adUrl" type="url" required /></div>
+                <button class="btn btn-primary btn-block">Add Campaign</button>
+              </form>
+            </div>
+            <div class="card">
+              <h4 style="margin-top:0;">Active campaigns</h4>
+              <table class="table-clean">
+                <thead><tr><th>Name</th><th>Size</th><th></th></tr></thead>
+                <tbody id="adRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- REVENUE -->
+        <section class="tab-panel" id="tab-revenue" style="display:none;">
+          <div class="grid-4" style="margin-bottom:20px;">
+            <div class="kpi-card card"><div class="kpi-label">Gross Revenue (30d)</div><div class="kpi-value">₹9,84,200</div></div>
+            <div class="kpi-card card"><div class="kpi-label">Publisher Payouts</div><div class="kpi-value">₹7,87,360</div></div>
+            <div class="kpi-card card"><div class="kpi-label">Platform Margin</div><div class="kpi-value">20%</div></div>
+            <div class="kpi-card card"><div class="kpi-label">Avg. CPM</div><div class="kpi-value">₹42.10</div></div>
+          </div>
+          <div class="card"><h4 style="margin-top:0;">Revenue — last 14 days</h4><canvas id="revenueChart" height="160"></canvas></div>
+        </section>
+
+        <!-- PAYMENTS -->
+        <section class="tab-panel" id="tab-payments" style="display:none;">
+          <div class="card">
+            <h4 style="margin-top:0;">Pending withdrawal requests</h4>
+            <div style="overflow-x:auto;">
+              <table class="table-clean">
+                <thead><tr><th>Publisher</th><th>Method</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="pendingPaymentRows"><tr><td colspan="5" class="text-muted">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="tab-panel" id="tab-settings" style="display:none;">
+          <div class="card" style="max-width:560px;">
+            <h4 style="margin-top:0;">Site configuration</h4>
+            <div class="form-field"><label>Site name</label><input id="cfgSiteName" value="AdNetX" /></div>
+            <div class="form-field"><label>Minimum withdrawal (₹)</label><input id="cfgMinWithdraw" type="number" value="500" /></div>
+            <div class="form-field"><label>Default revenue share (%)</label><input id="cfgRevShare" type="number" value="70" /></div>
+            <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+            <p class="form-note" id="settingsSaved" style="display:none; color:var(--mint); margin-top:10px;">Saved.</p>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+<script src="../js/admin.js"></script>
+</body>
+</html>
